@@ -16,6 +16,7 @@
         display: flex;
         flex-wrap: wrap;
         margin-top: 30px;
+        font-family: "Arial Unicode MS"
     }
 
     .specialchars .char {
@@ -83,11 +84,27 @@
 <body>
     <div class="title">字符和编码</div>
     <div class="memo">
-         HTML：&#十进制   CSS：\十六进制   JavaScript：\u十六进制  
+        HTML：&#十进制 CSS：\十六进制 JavaScript：\u十六进制 <br>
+        Unicode 编码：将世界上所有的符号都纳入其中，包括英文、日文、中文 韩语等等
+        希腊字母，西里尔文，亚美尼亚文，希伯来文
+        <br>
+        用四位16进制表示，范围在0 - 65535 之间。<br>
+        Math.pow(16,4)=65536 <br>
+        前128个字符就是ASCII码，之后是扩展码
+        汉文，韩语，日语的象形文字占用从0X3000到0X9FFF的代码
+        7位ASCII码是用七位二进制数进行编码的，可以表示128个字符
+        第0～32号及第127号(共34个)是控制字符或通讯专用字符，如控制符：LF（换行）、CR（回车）、FF（换页）、DEL（删除）、BEL（振铃）等；
+        通讯专用字符：SOH（文头）、EOT（文尾）、ACK（确认）等；
+        第33～126号(共94个)是字符，其中第48～57号为0～9十个阿拉伯数字；65～90号为26个大写英文字母，97～122号为26个小写英文字母，其余为一些标点符号、运算符号等。
+        一个ASCII码值占一个字节(8个二进制位)，其最高位(b7)用作奇偶校验位。所谓奇偶校验，是指在代码传送过程中用来检验是否出现错误的一种方法，一般分奇校验和偶校验两种。奇校验规定：正确的代码一个字节中1的个数必须是奇数，若非奇数，则在最高位b7添1；偶校验规定：正确的代码一个字节中1的个数必须是偶数，若非偶数，则在最高位b7添1。
+        js方法<br>
+        String.fromCharCode() 接受Unicode 值，返回字符串<br>
+        StringObject.charCodeAt() 返回指定位置的字符的 Unicode 编码<br>
     </div>
     <div>
-        起始编码 <input type="number" value="8672" size="10" name="startcode">
-        显示个数 <input type="number" value="1000" size="10" name="len">
+        起始编码 <br>
+        十进制<input type="number" value="8672" size="10" name="code">          十六进制<input type="text" value="21E0" size="10" name="hexcode"><br>
+        显示个数 <input type="number" value="1000" size="10" name="len"><br>
         <button class="run">提交</button>
     </div>
     <div class="specialchars">
@@ -95,6 +112,8 @@
     <div class="tip"></div>
     <script>
     'use strict';
+
+    document.write(Math.pow(16, 4))
     //定义类属性    方法不允许枚举
     var createClass = function() {
         function defineProperties(target, props) {
@@ -238,15 +257,15 @@
         limited = posinfo(sc)
         // tip.style.left = Math.min(Math.max(pos.left - pos.width * 2, pos.left), limited.width - pos.width * 5) + "px"
 
-        if(pos.left - pos.width * 2<=0){
-            tip.style.left =pos.left+"px"
-        }else{
-            if(pos.left+ pos.width * 5>limited.width ){
-                tip.style.left=pos.left - pos.width * 4 +"px"
-            }else{
-                tip.style.left =pos.left - pos.width * 2 +"px"
+        if (pos.left - pos.width * 2 <= 0) {
+            tip.style.left = pos.left + "px"
+        } else {
+            if (pos.left + pos.width * 5 > limited.width) {
+                tip.style.left = pos.left - pos.width * 4 + "px"
+            } else {
+                tip.style.left = pos.left - pos.width * 2 + "px"
             }
-            
+
         }
 
 
@@ -261,8 +280,8 @@
         tip.setAttribute("hide", "")
     }
 
-    var el = document.querySelector(".specialchars")
-    addEvent(el, "mousemove", function(e) {
+    // var el = document.querySelector(".specialchars")
+    addEvent(document.body, "mousemove", function(e) {
         var e = e || event
         var offx = e.clientX,
             offy = e.clientY;
@@ -279,12 +298,22 @@
     })
 
     createChars(8672, 1000)
+    //data-bind
+    var code=document.querySelector("input[name='code']")
+    var hexcode=document.querySelector("input[name='hexcode']")
+    var len = document.querySelector("input[name='len']")
+    addEvent(code,"input",function(){
+        hexcode.value=Number(this.value).toString(16).toUpperCase()
+    })
+     addEvent(hexcode,"input",function(){
+        code.value=parseInt(this.value,16)
+     })
 
     var btn = document.querySelector("button.run")
     addEvent(btn, "click", function() {
-        var startCode = document.querySelector("input[name='startcode']").value;
-        var len = document.querySelector("input[name='len']").value;
-        createChars(Number(startCode), Number(len))
+        // var code = document.querySelector("input[name='code']").value;
+        // var len = document.querySelector("input[name='len']").value;
+        createChars(Number(code.value), Number(len.value))
     })
     </script>
 </body>
