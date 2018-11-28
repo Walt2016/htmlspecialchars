@@ -6,19 +6,23 @@
     <meta name='viewport' content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' />
     <title>htmlspecialchars</title>
     <style>
-    .specialchars {
-        border: 1px solid #ccc;
+        .specialchars {
+        outline: 1px solid #ccc;
         word-break: break-all;
         padding: 4px;
-        font-size: 16px;
-        line-height: 20px;
+        /*        font-size: 16px;
+        line-height: 20px;*/
         cursor: pointer;
         display: flex;
         flex-wrap: wrap;
+        margin-top: 30px;
     }
 
     .specialchars .char {
         min-width: 20px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
     }
 
 
@@ -32,48 +36,60 @@
         align-items: center;
         flex-direction: column;
     }
-    .tip[hide]{
-    	display: none;
+
+    .tip[hide] {
+        display: none;
     }
-    .specialchars .char[active],.tip{
-    	color: red;
-    	outline: 1px solid #000;
-    	background: rgba(255, 255, 255, .8);
+
+    .specialchars .char[active],
+    .tip {
+        color: red;
+        outline: 1px solid #000;
+        background: rgba(255, 255, 255, .8);
     }
-    .tip div{
-    	flex:1;
-    	width: 100%;
-    	display: flex;
-    	justify-content: center;
+
+    .tip div {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        justify-content: center;
         align-items: center;
     }
 
-    .tip .code{
-    	outline:  1px solid #000;
+    .tip .code {
+        outline: 1px solid #000;
     }
 
-    .tip .char{
-    	font-size: 25px;
+    .tip .char {
+        font-size: 25px;
+        line-height: 25px;
+        height: 25px;
 
     }
-    .title{
-    	font-size: 20px;
-    	line-height: 20px;
-    	height: 20px;
+
+    .title {
+        font-size: 20px;
+        line-height: 20px;
+        height: 20px;
     }
-    .memo{
-    	font-size: 12px;
-    	color: #ccc;
+
+    .memo {
+        font-size: 12px;
+        color: #ccc;
     }
     </style>
 </head>
 
 <body>
-	<div class="title">字符和编码</div>
-	<div class="memo">
-		用于HTML（在字符前加 &# ）	用于 CSS （在字符前加 \ ） 和 JavaScript（在字符前加 \u ）
-	</div>
-    
+    <div class="title">字符和编码</div>
+    <div class="memo">
+         HTML：&#十进制   CSS：\十六进制   JavaScript：\u十六进制  
+    </div>
+    <div>
+        起始编码 <input type="number" value="8672" size="10" name="startcode">
+        显示个数 <input type="number" value="1000" size="10" name="len">
+        <button class="run">提交</button>
+    </div>
     <div class="specialchars">
     </div>
     <div class="tip"></div>
@@ -104,7 +120,6 @@
             return Constructor;
         };
     }();
-    // /图形样式	用于HTML（在字符前加 &# ）	用于 CSS （在字符前加 \ ） 和 JavaScript（在字符前加 \u ）
     //十进制转其他  
     // var x=110;  
     // alert(x);  
@@ -121,24 +136,22 @@
     // alert(String.fromCharCode(parseInt(141,8)))  
     // alert(parseInt('ff',16).toString(2));   
 
+    var sc = document.querySelector(".specialchars")
+    var createChars = function(start, len) {
+        var frag = document.createDocumentFragment()
+        for (var i = 0; i < len; i++) {
+            var s = String.fromCharCode(start + i)
+            var div = document.createElement("div")
+            div.className = 'char'
+            div.innerText = s
+            frag.appendChild(div)
+        }
 
-    var code = 8672
-    var arr = []
-    for (var i = 0; i < 1000; i++) {
-        var s = String.fromCharCode(code + i)
-        arr.push(s)
+        sc.innerHTML = ""
+        sc.appendChild(frag)
     }
 
-    var frag = document.createDocumentFragment()
-    arr.forEach(function(t) {
-        var div = document.createElement("div")
-        div.className = 'char'
-        div.innerText = t
-        frag.appendChild(div)
-    })
-    var sc = document.querySelector(".specialchars")
-    sc.appendChild(frag)
-   
+
     var posinfo = function() {
 
         function Posinfo(el, limited) {
@@ -189,44 +202,63 @@
         }
     };
 
+    var limited = posinfo(sc)
+    console.log(limited)
+    var tip = document.querySelector(".tip");
+
     var showTip = function(el, x, y) {
         var pos = posinfo(el)
-        console.log(pos)
-        var tip = document.querySelector(".tip");
+        // console.log(pos)
+
         tip.removeAttribute("hide")
         var txt = el.innerText
         var code = txt.charCodeAt(0);
         var hex = code.toString(16).toUpperCase()
         // tip.innerHTML = txt + "<br>&#38;#" + code + "<br>\\u" + hex
-        tip.innerHTML=""
-        var frag=document.createDocumentFragment();
-        var div=document.createElement("div");
-        div.className="char"
-        div.innerText=txt;
+        tip.innerHTML = ""
+        var frag = document.createDocumentFragment();
+        var div = document.createElement("div");
+        div.className = "char"
+        div.innerText = txt;
         frag.appendChild(div)
 
-        var div=document.createElement("div");
-        div.className="code"
-        div.innerText="&#" + code;
+        var div = document.createElement("div");
+        div.className = "code"
+        div.innerText = "&#" + code;
         frag.appendChild(div)
 
-        var div=document.createElement("div");
-        div.className="hex"
-        div.innerText="\\u" + hex
+        var div = document.createElement("div");
+        div.className = "hex"
+        div.innerText = "\\u" + hex
         frag.appendChild(div)
         tip.appendChild(frag);
         tip.style.width = pos.width * 5 + "px"
         tip.style.height = pos.height * 5 + "px"
-        tip.style.left = pos.left - pos.width * 2 + "px"
-        if(pos.top - pos.height * 5  >=0){
-        	tip.style.top = pos.top - pos.height * 5  + "px"
+
+        limited = posinfo(sc)
+        // tip.style.left = Math.min(Math.max(pos.left - pos.width * 2, pos.left), limited.width - pos.width * 5) + "px"
+
+        if(pos.left - pos.width * 2<=0){
+            tip.style.left =pos.left+"px"
         }else{
-        	tip.style.top = pos.top + pos.height   + "px"
+            if(pos.left+ pos.width * 5>limited.width ){
+                tip.style.left=pos.left - pos.width * 4 +"px"
+            }else{
+                tip.style.left =pos.left - pos.width * 2 +"px"
+            }
+            
+        }
+
+
+        if (pos.top - pos.height * 5 >= 0) {
+            tip.style.top = pos.top - pos.height * 5 + "px"
+        } else {
+            tip.style.top = pos.top + pos.height + "px"
         }
     }
-    var hideTip=function(){
-    	var tip = document.querySelector(".tip");
-    	tip.setAttribute("hide", "")
+    var hideTip = function() {
+        var tip = document.querySelector(".tip");
+        tip.setAttribute("hide", "")
     }
 
     var el = document.querySelector(".specialchars")
@@ -241,11 +273,19 @@
         if (char.className == "char") {
             char.setAttribute("active", "")
             showTip(char, offx, offy)
-        }else{
-        	hideTip()
+        } else {
+            hideTip()
         }
     })
 
+    createChars(8672, 1000)
+
+    var btn = document.querySelector("button.run")
+    addEvent(btn, "click", function() {
+        var startCode = document.querySelector("input[name='startcode']").value;
+        var len = document.querySelector("input[name='len']").value;
+        createChars(Number(startCode), Number(len))
+    })
     </script>
 </body>
 
