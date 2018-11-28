@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' />
+    <title>htmlspecialchars</title>
+    <style>
+    .specialchars {
+        border: 1px solid #ccc;
+        word-break: break-all;
+        padding: 4px;
+        font-size: 16px;
+        line-height: 20px;
+        cursor: pointer;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .specialchars .char {
+        min-width: 20px;
+    }
+
+
+    .tip {
+        position: absolute;
+        text-align: center;
+        overflow: hidden;
+        font-weight: bolder;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .tip[hide]{
+    	display: none;
+    }
+    .specialchars .char[active],.tip{
+    	color: red;
+    	outline: 1px solid #000;
+    	background: rgba(255, 255, 255, .8);
+    }
+    .tip div{
+    	flex:1;
+    	width: 100%;
+    	display: flex;
+    	justify-content: center;
+        align-items: center;
+    }
+
+    .tip .code{
+    	outline:  1px solid #000;
+    }
+
+    .tip .char{
+    	font-size: 25px;
+
+    }
+    .title{
+    	font-size: 20px;
+    	line-height: 20px;
+    	height: 20px;
+    }
+    .memo{
+    	font-size: 12px;
+    	color: #ccc;
+    }
+    </style>
+</head>
+
+<body>
+	<div class="title">字符和编码</div>
+	<div class="memo">
+		用于HTML（在字符前加 &# ）	用于 CSS （在字符前加 \ ） 和 JavaScript（在字符前加 \u ）
+	</div>
+    
+    <div class="specialchars">
+    </div>
+    <div class="tip"></div>
+    <script>
+    'use strict';
+    //定义类属性    方法不允许枚举
+    var createClass = function() {
+        function defineProperties(target, props) {
+            for (var key in props) {
+                if (target.hasOwnProperty(key)) {
+                    console.log(_.type(target) + " hasOwnProperty " + key)
+                } else {
+                    //不覆盖已有属性
+                    var descriptor = {
+                        key: key,
+                        value: props[key],
+                        enumerable: false,
+                        configurable: true,
+                        writable: true
+                    }
+                    Object.defineProperty(target, key, descriptor);
+                }
+            }
+        }
+        return function(Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
+    // /图形样式	用于HTML（在字符前加 &# ）	用于 CSS （在字符前加 \ ） 和 JavaScript（在字符前加 \u ）
+    //十进制转其他  
+    // var x=110;  
+    // alert(x);  
+    // alert(x.toString(8));  
+    // alert(x.toString(32));  
+    // alert(x.toString(16));  
+    // //其他转十进制  
+    // var x='110';  
+    // alert(parseInt(x,2));  
+    // alert(parseInt(x,8));  
+    // alert(parseInt(x,16));  
+    // //其他转其他  
+    // //先用parseInt转成十进制再用toString转到目标进制  
+    // alert(String.fromCharCode(parseInt(141,8)))  
+    // alert(parseInt('ff',16).toString(2));   
+
+
+    var code = 8672
+    var arr = []
+    for (var i = 0; i < 1000; i++) {
+        var s = String.fromCharCode(code + i)
+        arr.push(s)
+    }
+
+    var frag = document.createDocumentFragment()
+    arr.forEach(function(t) {
+        var div = document.createElement("div")
+        div.className = 'char'
+        div.innerText = t
+        frag.appendChild(div)
+    })
+    var sc = document.querySelector(".specialchars")
+    sc.appendChild(frag)
+   
+    var posinfo = function() {
+
+        function Posinfo(el, limited) {
+            if (!(this instanceof Posinfo)) return new Posinfo(el, limited);
+            if (!el) {
+                console.log("el is null")
+                return false
+            }
+            var self = this;
+            this.top = el.offsetTop;
+            this.left = el.offsetLeft;
+            var parent = el.offsetParent;
+            while (parent) {
+                this.left += parent.offsetLeft;
+                this.top += parent.offsetTop;
+                parent = parent.offsetParent;
+            }
+            this.height = el.offsetHeight;
+            this.width = el.offsetWidth;
+
+
+            // ["width", "height", "top", "left"].forEach(function(t) {
+            //     self[t] = parseFloat(self.getStyle(el, t))
+            // });
+
+            this["minTop"] = -1 * parseFloat(this.getStyle(el, "margin-top"));
+            this["minLeft"] = -1 * parseFloat(this.getStyle(el, "margin-left"));
+            if (limited) {
+                //     // x: document.documentElement.clientWidth,
+                //     // y: document.documentElement.clientHeight
+                this["maxTop"] = limited.height - this.height + this.minTop;
+                this["maxLeft"] = limited.width - this.width + this.minLeft;
+            }
+        }
+
+        return createClass(Posinfo, {
+            getStyle: function(el, attr) {
+                return window.getComputedStyle ? window.getComputedStyle(el, null)[attr] : el.currentStyle[attr]
+            }
+        })
+    }();
+
+    var addEvent = function(el, type, listener) {
+        if (window.addEventListener) {
+            el.addEventListener(type, listener, false);
+        } else {
+            el.attachEvent('on' + type, listener);
+        }
+    };
+
+    var showTip = function(el, x, y) {
+        var pos = posinfo(el)
+        console.log(pos)
+        var tip = document.querySelector(".tip");
+        tip.removeAttribute("hide")
+        var txt = el.innerText
+        var code = txt.charCodeAt(0);
+        var hex = code.toString(16).toUpperCase()
+        // tip.innerHTML = txt + "<br>&#38;#" + code + "<br>\\u" + hex
+        tip.innerHTML=""
+        var frag=document.createDocumentFragment();
+        var div=document.createElement("div");
+        div.className="char"
+        div.innerText=txt;
+        frag.appendChild(div)
+
+        var div=document.createElement("div");
+        div.className="code"
+        div.innerText="&#" + code;
+        frag.appendChild(div)
+
+        var div=document.createElement("div");
+        div.className="hex"
+        div.innerText="\\u" + hex
+        frag.appendChild(div)
+        tip.appendChild(frag);
+        tip.style.width = pos.width * 5 + "px"
+        tip.style.height = pos.height * 5 + "px"
+        tip.style.left = pos.left - pos.width * 2 + "px"
+        if(pos.top - pos.height * 5  >=0){
+        	tip.style.top = pos.top - pos.height * 5  + "px"
+        }else{
+        	tip.style.top = pos.top + pos.height   + "px"
+        }
+    }
+    var hideTip=function(){
+    	var tip = document.querySelector(".tip");
+    	tip.setAttribute("hide", "")
+    }
+
+    var el = document.querySelector(".specialchars")
+    addEvent(el, "mousemove", function(e) {
+        var e = e || event
+        var offx = e.clientX,
+            offy = e.clientY;
+
+        var active = document.querySelector(".char[active]");
+        active && active.removeAttribute("active")
+        var char = e.target;
+        if (char.className == "char") {
+            char.setAttribute("active", "")
+            showTip(char, offx, offy)
+        }else{
+        	hideTip()
+        }
+    })
+
+    </script>
+</body>
+
+</html>
