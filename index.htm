@@ -156,7 +156,6 @@
 
 <body>
     <div class="title">字符和unicode编码</div>
-   
     <div class="memo">
         HTML：&#十进制 CSS：\十六进制 JavaScript：\u十六进制 <br>
         <br>
@@ -275,7 +274,7 @@
         function Specialchars() {
             if (!(this instanceof Specialchars)) return new Specialchars();
             this.specialchars = document.querySelector(".specialchars");
-            
+
             this.tip = document.querySelector(".tip");
             this.codeIpt = document.querySelector("input[name='code']");
             this.hexcodeIpt = document.querySelector("input[name='hexcode']");
@@ -354,7 +353,7 @@
             },
 
             reloadUnicodeTable: function(unicode) {
-                var self=this;
+                var self = this;
 
                 var frag = document.createDocumentFragment()
                 var tbody = document.createElement("tbody")
@@ -460,7 +459,7 @@
 
             setup: function() {
 
-                var self=this;
+                var self = this;
 
                 this.creatUnicodeTable(this.unicode);
                 this.reloadUnicodeTable(this.unicode)
@@ -477,10 +476,16 @@
                     if (char.className == "char") {
                         char.setAttribute("active", "")
                         self.showTip(char, offx, offy)
-                    } else {
-                        // hideTip()
                     }
                 });
+                this.addEvent(document.body,"click",function(e){
+                    var el=e.target;
+                    var container=self.closest(el,".specialchars");
+                    if(!container){
+                         self.hideTip()
+                    }
+
+                })
 
 
 
@@ -507,8 +512,16 @@
 
                     }
                 }
+                var getColumIndex = function(key) {
+                    var index = -1;
+                    self.flds.forEach(function(t, i) {
+                        if (t.key === key) {
+                            index = i;
+                        }
+                    })
+                    return index
+                }
                 this.addEvent(this.unicodeTable, "click", function(e) {
-
                     var el = e.target
                     var thead = self.closest(el, "thead")
 
@@ -521,19 +534,17 @@
                         td.setAttribute("seq", seq)
                         var key = td.className
                         self.unicode = self.unicode.sort(sortBy(key, seq === "desc"))
-                        // creatUnicodeTable(unicode);
+
                         self.reloadUnicodeTable(self.unicode)
                     } else {
-
                         var tr = self.closest(el, "tr")
                         var old = document.querySelector("tr[active]")
                         old && old.removeAttribute("active")
-
                         tr.setAttribute("active", "");
-                        // console.log(tr)
-                        self.codeIpt.value = Number("0x" + tr.children[1].innerText);
-                        self.hexcodeIpt.value = tr.children[1].innerText;
-                        self.countIpt.value = Number(tr.children[3].innerText)
+                        var codeHex = tr.children[getColumIndex("startHex")].innerText
+                        self.codeIpt.value = Number("0x" + codeHex);
+                        self.hexcodeIpt.value = codeHex;
+                        self.countIpt.value = Number(tr.children[getColumIndex("count")].innerText)
                         self.runBtn.click()
 
                     }
