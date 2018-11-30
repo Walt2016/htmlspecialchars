@@ -165,6 +165,19 @@
         content:"\2193";
     }
 
+    .searchBox{
+        height: 60px;
+
+    }
+
+    input[name="code"],input[name="hexcode"],input[name="count"]{
+        width:60px;
+        border: 1px solid #ccc;
+        font-size: 12px;
+        line-height: 20px;
+        height: 20px;
+    }
+
    
     </style>
 </head>
@@ -175,11 +188,11 @@
         HTML：&#十进制 CSS：\十六进制 JavaScript：\u十六进制 <br>
         <br>
     </div>
-    <div class="heade">
+    <div class="searchBox">
         起始编码 0--65536 (0xFFFF)<br>
-        十进制<input type="number" value="8672" size="10" name="code"> (十六进制 <input type="text" value="21E0" size="10" name="hexcode">)
+        十进制<input type="number" value="8672" size="10" name="code"> (十六进制 <input type="text" value="21E0"  name="hexcode">)
         显示个数 <input type="number" value="1000" size="10" name="count">
-        <button class="run">提交</button>
+        <button class="search">查询</button>
     </div>
     <div class="container">
         <div class="section">
@@ -222,24 +235,6 @@
             return Constructor;
         };
     }();
-    //十进制转其他  
-    // var x=110;  
-    // alert(x);  
-    // alert(x.toString(8));  
-    // alert(x.toString(32));  
-    // alert(x.toString(16));  
-    // //其他转十进制  
-    // var x='110';  
-    // alert(parseInt(x,2));  
-    // alert(parseInt(x,8));  
-    // alert(parseInt(x,16));  
-    // //其他转其他  
-    // //先用parseInt转成十进制再用toString转到目标进制  
-    // alert(String.fromCharCode(parseInt(141,8)))  
-    // alert(parseInt('ff',16).toString(2));   
-
-
-
 
     var posinfo = function() {
         function Posinfo(el, limited) {
@@ -294,13 +289,9 @@
             this.codeIpt = document.querySelector("input[name='code']");
             this.hexcodeIpt = document.querySelector("input[name='hexcode']");
             this.countIpt = document.querySelector("input[name='count']");
-            this.runBtn = document.querySelector("button.run");
-            this.unicode = unicode;
-
+            this.searchBtn = document.querySelector("button.search");
+            this.unicode = unicode||[];
             this.unicodeTable = document.querySelector(".unicode-table");
-
-
-
             this.flds = [{
                     key: "name",
                     val: "编码分类"
@@ -355,7 +346,6 @@
                         var td = document.createElement("td")
                         td.className = t.key
                         td.innerText = t.val
-
                         var icon = document.createElement("div")
                         icon.className = "icon"
                         td.appendChild(icon)
@@ -364,25 +354,13 @@
                     thead.appendChild(tr)
                     table.appendChild(thead)
                     return table
-
                 }
-
-
-
 
                 frag.appendChild(createTableHead())
 
-
-
-
-                // this.unicodeTableHead = document.querySelector(".unicode-table table thead");
-
                 this.fixedTableHead = document.createElement("div")
                 this.fixedTableHead.className = "fixedTableHead"
-                // fixedTableHead.appendChild(createTableHead())
                 frag.appendChild(this.fixedTableHead)
-
-                // this.unicodeTable.appendChild(fixedHead)
                 this.unicodeTable.innerHTML = ""
                 this.unicodeTable.appendChild(frag)
 
@@ -524,9 +502,7 @@
                     }
 
                 })
-
-
-
+                //数据绑定
                 this.addEvent(this.codeIpt, "input", function() {
                     self.hexcodeIpt.value = Number(this.value).toString(16).toUpperCase()
                 })
@@ -534,8 +510,8 @@
                     self.codeIpt.value = parseInt(this.value, 16)
                 })
 
-
-                this.addEvent(this.runBtn, "click", function() {
+                //查询
+                this.addEvent(this.searchBtn, "click", function() {
                     self.createChars(Number(self.codeIpt.value), Number(self.countIpt.value))
                 })
 
@@ -584,7 +560,7 @@
                         self.codeIpt.value = Number("0x" + codeHex);
                         self.hexcodeIpt.value = codeHex;
                         self.countIpt.value = Number(tr.children[getColumIndex("count")].innerText)
-                        self.runBtn.click()
+                        self.searchBtn.click()
 
                     }
 
