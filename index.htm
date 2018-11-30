@@ -446,16 +446,10 @@
                 }else{
                     self.specialchars.innerHTML = ""
                     _create();
-
                 }
-
-
             },
-
             showTip: function(el, x, y) {
                 var pos = posinfo(el)
-                // console.log(pos)
-
                 this.tip.removeAttribute("hide")
                 var txt = el.innerText
                 var code = txt.charCodeAt(0);
@@ -481,9 +475,6 @@
                 this.tip.style.width = pos.width * 5 + "px"
                 this.tip.style.height = pos.height * 5 + "px"
 
-                // if (pos.width > 40) {
-                //     console.log(el, pos)
-                // }
 
                 var limited = posinfo(this.specialchars)
                 if (pos.left - pos.width * 2 <= limited.left) {
@@ -495,8 +486,6 @@
                         this.tip.style.left = pos.left - pos.width * 2 + "px"
                     }
                 }
-
-
                 if (pos.top - pos.height * 5 >= 0) {
                     this.tip.style.top = pos.top - pos.height * 5 + "px"
                 } else {
@@ -514,17 +503,10 @@
             },
 
             setup: function() {
-
                 var self = this;
-
                 this.creatUnicodeTable(this.unicode);
                 this.reloadUnicodeTable(this.unicode)
                 this.createChars(8672, 1000)
-
-                // console.log(this.unicodeTableHead)
-
-
-                // var specialchars = document.querySelector(".specialchars")||document.body
                 this.addEvent(this.specialchars, "mousemove", function(e) {
                     var e = e || event
                     var offx = e.clientX,
@@ -644,9 +626,7 @@
             }
 
         })
-
     }();
-
     showSpecialchars();
     </script>
 </body>
