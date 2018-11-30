@@ -7,7 +7,7 @@
     <title>htmlspecialchars</title>
     <style>
         .specialchars {
-        outline: 1px solid #ccc;
+        /*outline: 1px solid #ccc;*/
         word-break: break-all;
         padding: 4px;
         /*        font-size: 16px;
@@ -15,7 +15,7 @@
         cursor: pointer;
         display: flex;
         flex-wrap: wrap;
-        margin-top: 30px;
+        /*margin-top: 30px;*/
         font-family: "Arial Unicode MS"
     }
 
@@ -47,6 +47,7 @@
         color: red;
         outline: 1px solid #000;
         background: rgba(255, 255, 255, .8);
+        transition: all 0.5s
     }
 
     .tip div {
@@ -57,16 +58,19 @@
         align-items: center;
     }
 
-    .tip .code {
-        outline: 1px solid #000;
-    }
-
     .tip .char {
         font-size: 25px;
         line-height: 25px;
         height: 25px;
+        flex:2;
 
     }
+    .tip .code {
+        outline: 1px solid #000;
+
+    }
+
+
 
     .title {
         font-size: 20px;
@@ -78,42 +82,107 @@
         font-size: 12px;
         color: #ccc;
     }
+    .unicode-table{
+
+
+    }
+
+    .unicode-table table{
+        border:1px solid rgb(170,204,238);
+        border-collapse:collapse;
+        line-height:22px;
+        color:rgb(0,0,0);
+        font-size: 12px;
+    }
+    .unicode-table  table tr{
+        cursor: pointer;
+    }
+   .unicode-table  table  td{
+        border:1px solid #C0C0C0;
+    }
+    .unicode-table  table  thead td{
+        font-weight:bold;
+        /*display: flex*/
+        position: relative;
+    }
+   /* .unicode-table  table tr:nth-child(even) {
+        background: #dedede
+    }*/
+
+    .unicode-table  table tr[active] {
+        background: #dedede;
+        position: relative;
+
+    }
+    .unicode-table  table tr[active]::after{
+    content: "\2b50";
+    font-size: 12px;
+    color:red;
+    margin-left: -18px;
+   /* position: absolute;
+    right: 0;
+    top:0;*/
+    }
+    .unicode-table  table tr:hover{
+    background: #ccc
+    }
+
+    .container{
+        display: flex;
+
+    }
+    .container .section{
+    display: flex;
+    flex-direction: column;
+    width:50%;
+            max-height: 500px;
+        overflow-y: auto;
+        min-width: 200px;
+    }
+    [seq] .icon{
+        position: absolute;
+        right: 0;
+        top: 0;
+        color:red;
+    }
+    [seq='desc'] .icon::before{
+        content:"\2191";
+    }
+    [seq='asc'] .icon::before{
+        content:"\2193";
+    }
     </style>
 </head>
 
 <body>
-    <div class="title">字符和编码</div>
+    <div class="title">字符和unicode编码</div>
+   
     <div class="memo">
         HTML：&#十进制 CSS：\十六进制 JavaScript：\u十六进制 <br>
-        Unicode 编码：将世界上所有的符号都纳入其中，包括英文、日文、中文 韩语等等
-        希腊字母，西里尔文，亚美尼亚文，希伯来文
         <br>
-        用四位16进制表示，范围在0 - 65535 之间。<br>
-        Math.pow(16,4)=65536 <br>
-        前128个字符就是ASCII码，之后是扩展码
-        汉文，韩语，日语的象形文字占用从0X3000到0X9FFF的代码
-        7位ASCII码是用七位二进制数进行编码的，可以表示128个字符
-        第0～32号及第127号(共34个)是控制字符或通讯专用字符，如控制符：LF（换行）、CR（回车）、FF（换页）、DEL（删除）、BEL（振铃）等；
-        通讯专用字符：SOH（文头）、EOT（文尾）、ACK（确认）等；
-        第33～126号(共94个)是字符，其中第48～57号为0～9十个阿拉伯数字；65～90号为26个大写英文字母，97～122号为26个小写英文字母，其余为一些标点符号、运算符号等。
-        一个ASCII码值占一个字节(8个二进制位)，其最高位(b7)用作奇偶校验位。所谓奇偶校验，是指在代码传送过程中用来检验是否出现错误的一种方法，一般分奇校验和偶校验两种。奇校验规定：正确的代码一个字节中1的个数必须是奇数，若非奇数，则在最高位b7添1；偶校验规定：正确的代码一个字节中1的个数必须是偶数，若非偶数，则在最高位b7添1。
-        js方法<br>
-        String.fromCharCode() 接受Unicode 值，返回字符串<br>
-        StringObject.charCodeAt() 返回指定位置的字符的 Unicode 编码<br>
     </div>
-    <div>
-        起始编码 <br>
-        十进制<input type="number" value="8672" size="10" name="code">          十六进制<input type="text" value="21E0" size="10" name="hexcode"><br>
-        显示个数 <input type="number" value="1000" size="10" name="len"><br>
+    <div class="heade">
+        起始编码 0--65536 (0xFFFF)<br>
+        十进制<input type="number" value="8672" size="10" name="code"> (十六进制 <input type="text" value="21E0" size="10" name="hexcode">)
+        显示个数 <input type="number" value="1000" size="10" name="count">
         <button class="run">提交</button>
     </div>
-    <div class="specialchars">
+    <div class="container">
+        <div class="section">
+            <div class="unicode-table">
+            </div>
+        </div>
+        <div class="section">
+            <div class="specialchars">
+            </div>
+            <div class="tip"></div>
+        </div>
     </div>
-    <div class="tip"></div>
+    <script src="unicode.js"></script>
     <script>
     'use strict';
 
-    document.write(Math.pow(16, 4))
+    // document.write(Math.pow(16, 4))
     //定义类属性    方法不允许枚举
     var createClass = function() {
         function defineProperties(target, props) {
@@ -155,24 +224,10 @@
     // alert(String.fromCharCode(parseInt(141,8)))  
     // alert(parseInt('ff',16).toString(2));   
 
-    var sc = document.querySelector(".specialchars")
-    var createChars = function(start, len) {
-        var frag = document.createDocumentFragment()
-        for (var i = 0; i < len; i++) {
-            var s = String.fromCharCode(start + i)
-            var div = document.createElement("div")
-            div.className = 'char'
-            div.innerText = s
-            frag.appendChild(div)
-        }
 
-        sc.innerHTML = ""
-        sc.appendChild(frag)
-    }
 
 
     var posinfo = function() {
-
         function Posinfo(el, limited) {
             if (!(this instanceof Posinfo)) return new Posinfo(el, limited);
             if (!el) {
@@ -180,6 +235,7 @@
                 return false
             }
             var self = this;
+            this.el = el
             this.top = el.offsetTop;
             this.left = el.offsetLeft;
             var parent = el.offsetParent;
@@ -190,6 +246,8 @@
             }
             this.height = el.offsetHeight;
             this.width = el.offsetWidth;
+            this.scrollHeight = el.scrollHeight
+            this.scrollTop = el.scrollTop;
 
 
             // ["width", "height", "top", "left"].forEach(function(t) {
@@ -213,108 +271,282 @@
         })
     }();
 
-    var addEvent = function(el, type, listener) {
-        if (window.addEventListener) {
-            el.addEventListener(type, listener, false);
-        } else {
-            el.attachEvent('on' + type, listener);
+    var showSpecialchars = function() {
+        function Specialchars() {
+            if (!(this instanceof Specialchars)) return new Specialchars();
+            this.specialchars = document.querySelector(".specialchars");
+            
+            this.tip = document.querySelector(".tip");
+            this.codeIpt = document.querySelector("input[name='code']");
+            this.hexcodeIpt = document.querySelector("input[name='hexcode']");
+            this.countIpt = document.querySelector("input[name='count']");
+            this.runBtn = document.querySelector("button.run");
+            this.unicode = unicode;
+
+            this.unicodeTable = document.querySelector(".unicode-table");
+
+            this.flds = [{
+                    key: "name",
+                    val: "编码分类"
+                }, {
+                    key: "startHex",
+                    val: "起始"
+                },
+                {
+                    key: "endHex",
+                    val: "结束"
+                },
+                {
+                    key: "count",
+                    val: "个数"
+                }
+            ];
+            this.limited = posinfo(this.specialchars);
+
+            this.setup();
         }
-    };
+        return createClass(Specialchars, {
+            addEvent: function(el, type, listener) {
+                if (window.addEventListener) {
+                    el.addEventListener(type, listener, false);
+                } else {
+                    el.attachEvent('on' + type, listener);
+                }
+            },
+            closest: function(el, cls) {
+                if (!el.parentNode) { //document
+                    return null
+                } else if (cls.indexOf(".") === 0 && el.className.indexOf(cls.substring(1)) >= 0) {
+                    return el;
+                } else if (cls.indexOf("#") === 0 && el.id.toLowerCase() === cls.substring(1).toLowerCase()) {
+                    return el;
+                } else if (el.tagName.toLowerCase() === cls.toLowerCase()) {
+                    return el
+                } else {
+                    return this.closest(el.parentNode, cls)
+                }
+            },
 
-    var limited = posinfo(sc)
-    console.log(limited)
-    var tip = document.querySelector(".tip");
+            creatUnicodeTable: function(unicode) {
+                var frag = document.createDocumentFragment()
+                var table = document.createElement("table")
+                var thead = document.createElement("thead");
+                var tr = document.createElement("tr");
 
-    var showTip = function(el, x, y) {
-        var pos = posinfo(el)
-        // console.log(pos)
+                this.flds.forEach(function(t) {
+                    var td = document.createElement("td")
+                    td.className = t.key
+                    td.innerText = t.val
 
-        tip.removeAttribute("hide")
-        var txt = el.innerText
-        var code = txt.charCodeAt(0);
-        var hex = code.toString(16).toUpperCase()
-        // tip.innerHTML = txt + "<br>&#38;#" + code + "<br>\\u" + hex
-        tip.innerHTML = ""
-        var frag = document.createDocumentFragment();
-        var div = document.createElement("div");
-        div.className = "char"
-        div.innerText = txt;
-        frag.appendChild(div)
+                    var icon = document.createElement("div")
+                    icon.className = "icon"
+                    td.appendChild(icon)
+                    tr.appendChild(td)
+                })
+                thead.appendChild(tr)
+                table.appendChild(thead)
+                frag.appendChild(table)
 
-        var div = document.createElement("div");
-        div.className = "code"
-        div.innerText = "&#" + code;
-        frag.appendChild(div)
 
-        var div = document.createElement("div");
-        div.className = "hex"
-        div.innerText = "\\u" + hex
-        frag.appendChild(div)
-        tip.appendChild(frag);
-        tip.style.width = pos.width * 5 + "px"
-        tip.style.height = pos.height * 5 + "px"
 
-        limited = posinfo(sc)
-        // tip.style.left = Math.min(Math.max(pos.left - pos.width * 2, pos.left), limited.width - pos.width * 5) + "px"
+                this.unicodeTable.innerHTML = ""
+                this.unicodeTable.appendChild(frag)
+            },
 
-        if (pos.left - pos.width * 2 <= 0) {
-            tip.style.left = pos.left + "px"
-        } else {
-            if (pos.left + pos.width * 5 > limited.width) {
-                tip.style.left = pos.left - pos.width * 4 + "px"
-            } else {
-                tip.style.left = pos.left - pos.width * 2 + "px"
+            reloadUnicodeTable: function(unicode) {
+                var self=this;
+
+                var frag = document.createDocumentFragment()
+                var tbody = document.createElement("tbody")
+                this.unicode.forEach(function(t) {
+                    var tr = document.createElement("tr");
+                    self.flds.forEach(function(f) {
+                        var td = document.createElement("td")
+                        if (f.key === "name") {
+                            td.innerText = t[f.key] + "(" + t["ename"] + ")"
+                        } else {
+                            td.innerText = t[f.key]
+                        }
+                        tr.appendChild(td)
+                    })
+                    tbody.appendChild(tr)
+                });
+                var table = document.querySelector(".unicode-table table")
+                var oldtbody = document.querySelector(".unicode-table tbody")
+                oldtbody && table.removeChild(oldtbody)
+                table.appendChild(tbody)
+                frag.appendChild(table)
+                this.unicodeTable.appendChild(frag)
+
+            },
+
+            createChars: function(start, len) {
+                var frag = document.createDocumentFragment()
+                for (var i = 0; i < len; i++) {
+                    var s = String.fromCharCode(start + i)
+                    var div = document.createElement("div")
+                    div.className = 'char'
+                    div.innerText = s
+                    frag.appendChild(div)
+                }
+
+                this.specialchars.innerHTML = ""
+                this.specialchars.appendChild(frag)
+            },
+
+            showTip: function(el, x, y) {
+                var pos = posinfo(el)
+                // console.log(pos)
+
+                this.tip.removeAttribute("hide")
+                var txt = el.innerText
+                var code = txt.charCodeAt(0);
+                var hex = code.toString(16).toUpperCase()
+                // this.tip.innerHTML = txt + "<br>&#38;#" + code + "<br>\\u" + hex
+                this.tip.innerHTML = ""
+                var frag = document.createDocumentFragment();
+                var div = document.createElement("div");
+                div.className = "char"
+                div.innerText = txt;
+                frag.appendChild(div)
+
+                var div = document.createElement("div");
+                div.className = "code"
+                div.innerText = "&#" + code;
+                frag.appendChild(div)
+
+                var div = document.createElement("div");
+                div.className = "hex"
+                div.innerText = "\\u" + hex
+                frag.appendChild(div)
+                this.tip.appendChild(frag);
+                this.tip.style.width = pos.width * 5 + "px"
+                this.tip.style.height = pos.height * 5 + "px"
+
+                // if (pos.width > 40) {
+                //     console.log(el, pos)
+                // }
+
+                var limited = posinfo(this.specialchars)
+                // tip.style.left = Math.min(Math.max(pos.left - pos.width * 2, pos.left), limited.width - pos.width * 5) + "px"
+
+                if (pos.left - pos.width * 2 <= 0) {
+                    this.tip.style.left = pos.left + "px"
+                } else {
+                    if (pos.left + pos.width * 5 > limited.width) {
+                        this.tip.style.left = pos.left - pos.width * 4 + "px"
+                    } else {
+                        this.tip.style.left = pos.left - pos.width * 2 + "px"
+                    }
+
+                }
+
+
+                if (pos.top - pos.height * 5 >= 0) {
+                    this.tip.style.top = pos.top - pos.height * 5 + "px"
+                } else {
+                    this.tip.style.top = pos.top + pos.height + "px"
+                }
+
+                var section = posinfo(this.closest(this.specialchars, ".section"))
+                if (section.scrollTop > 0) {
+                    this.tip.style.top = pos.top - pos.height * 5 - section.scrollTop + "px"
+                }
+            },
+            hideTip: function() {
+                // var tip = document.querySelector(".tip");
+                this.tip.setAttribute("hide", "")
+            },
+
+            setup: function() {
+
+                var self=this;
+
+                this.creatUnicodeTable(this.unicode);
+                this.reloadUnicodeTable(this.unicode)
+                this.createChars(8672, 1000)
+                // var specialchars = document.querySelector(".specialchars")||document.body
+                this.addEvent(this.specialchars, "mousemove", function(e) {
+                    var e = e || event
+                    var offx = e.clientX,
+                        offy = e.clientY;
+
+                    var active = document.querySelector(".specialchars .char[active]");
+                    active && active.removeAttribute("active")
+                    var char = e.target;
+                    if (char.className == "char") {
+                        char.setAttribute("active", "")
+                        self.showTip(char, offx, offy)
+                    } else {
+                        // hideTip()
+                    }
+                });
+
+
+
+                this.addEvent(this.codeIpt, "input", function() {
+                    self.hexcodeIpt.value = Number(this.value).toString(16).toUpperCase()
+                })
+                this.addEvent(this.hexcodeIpt, "input", function() {
+                    self.codeIpt.value = parseInt(this.value, 16)
+                })
+
+
+                this.addEvent(this.runBtn, "click", function() {
+                    self.createChars(Number(self.codeIpt.value), Number(self.countIpt.value))
+                })
+
+
+                var sortBy = function(key, asc) {
+                    return function(a, b) {
+                        if (key === "count") {
+                            return asc ? a[key] - b[key] : b[key] - a[key]
+                        } else {
+                            return asc ? a[key].localeCompare(b[key], 'zh-CN') : b[key].localeCompare(a[key], 'zh-CN')
+                        }
+
+                    }
+                }
+                this.addEvent(this.unicodeTable, "click", function(e) {
+
+                    var el = e.target
+                    var thead = self.closest(el, "thead")
+
+                    if (thead) {
+                        var td = self.closest(el, "td")
+                        var seq = td.getAttribute("seq")
+                        seq = seq === "desc" ? "asc" : "desc"
+                        var oldTd = document.querySelector("td[seq]")
+                        oldTd && oldTd.removeAttribute("seq")
+                        td.setAttribute("seq", seq)
+                        var key = td.className
+                        self.unicode = self.unicode.sort(sortBy(key, seq === "desc"))
+                        // creatUnicodeTable(unicode);
+                        self.reloadUnicodeTable(self.unicode)
+                    } else {
+
+                        var tr = self.closest(el, "tr")
+                        var old = document.querySelector("tr[active]")
+                        old && old.removeAttribute("active")
+
+                        tr.setAttribute("active", "");
+                        // console.log(tr)
+                        self.codeIpt.value = Number("0x" + tr.children[1].innerText);
+                        self.hexcodeIpt.value = tr.children[1].innerText;
+                        self.countIpt.value = Number(tr.children[3].innerText)
+                        self.runBtn.click()
+
+                    }
+
+                })
+
             }
 
-        }
+        })
 
+    }();
 
-        if (pos.top - pos.height * 5 >= 0) {
-            tip.style.top = pos.top - pos.height * 5 + "px"
-        } else {
-            tip.style.top = pos.top + pos.height + "px"
-        }
-    }
-    var hideTip = function() {
-        var tip = document.querySelector(".tip");
-        tip.setAttribute("hide", "")
-    }
-
-    // var el = document.querySelector(".specialchars")
-    addEvent(document.body, "mousemove", function(e) {
-        var e = e || event
-        var offx = e.clientX,
-            offy = e.clientY;
-
-        var active = document.querySelector(".char[active]");
-        active && active.removeAttribute("active")
-        var char = e.target;
-        if (char.className == "char") {
-            char.setAttribute("active", "")
-            showTip(char, offx, offy)
-        } else {
-            hideTip()
-        }
-    })
-
-    createChars(8672, 1000)
-    //data-bind
-    var code=document.querySelector("input[name='code']")
-    var hexcode=document.querySelector("input[name='hexcode']")
-    var len = document.querySelector("input[name='len']")
-    addEvent(code,"input",function(){
-        hexcode.value=Number(this.value).toString(16).toUpperCase()
-    })
-     addEvent(hexcode,"input",function(){
-        code.value=parseInt(this.value,16)
-     })
-
-    var btn = document.querySelector("button.run")
-    addEvent(btn, "click", function() {
-        // var code = document.querySelector("input[name='code']").value;
-        // var len = document.querySelector("input[name='len']").value;
-        createChars(Number(code.value), Number(len.value))
-    })
+    showSpecialchars();
     </script>
 </body>
 
