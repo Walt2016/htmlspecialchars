@@ -177,6 +177,28 @@
         line-height: 20px;
         height: 20px;
     }
+    
+    .section.chars{
+        position: relative;
+    }
+    .loading{
+        display: none;
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%,-50%);
+    }
+    .loading[show]{
+        display: block;
+    }
+    .loading::before{
+        content: "\23f3";
+        font-size: 50px;
+        width:100px;
+        height: 100px;
+        line-height: 100px;
+    }
+
 
    
     </style>
@@ -190,19 +212,20 @@
     </div>
     <div class="searchBox">
         起始编码 0--65536 (0xFFFF)<br>
-        十进制<input type="number" value="8672" size="10" name="code"> (十六进制 <input type="text" value="21E0"  name="hexcode">)
+        十进制<input type="number" value="8672" size="10" name="code"> (十六进制 <input type="text" value="21E0" name="hexcode">)
         显示个数 <input type="number" value="1000" size="10" name="count">
         <button class="search">查询</button>
     </div>
     <div class="container">
-        <div class="section">
+        <div class="section list">
             <div class="unicode-table">
             </div>
         </div>
-        <div class="section">
+        <div class="section chars">
             <div class="specialchars">
             </div>
             <div class="tip"></div>
+            <div class="loading"></div>
         </div>
     </div>
     <script src="unicode.js"></script>
@@ -248,11 +271,11 @@
             this.top = el.offsetTop;
             this.left = el.offsetLeft;
             var parent = el.offsetParent;
-            while (parent) {
-                this.left += parent.offsetLeft;
-                this.top += parent.offsetTop;
-                parent = parent.offsetParent;
-            }
+            // while (parent) {
+            //     this.left += parent.offsetLeft;
+            //     this.top += parent.offsetTop;
+            //     parent = parent.offsetParent;
+            // }
             this.height = el.offsetHeight;
             this.width = el.offsetWidth;
             this.scrollHeight = el.scrollHeight
@@ -290,7 +313,7 @@
             this.hexcodeIpt = document.querySelector("input[name='hexcode']");
             this.countIpt = document.querySelector("input[name='count']");
             this.searchBtn = document.querySelector("button.search");
-            this.unicode = unicode||[];
+            this.unicode = unicode || [];
             this.unicodeTable = document.querySelector(".unicode-table");
             this.flds = [{
                     key: "name",
@@ -395,17 +418,38 @@
             },
 
             createChars: function(start, len) {
-                var frag = document.createDocumentFragment()
-                for (var i = 0; i < len; i++) {
-                    var s = String.fromCharCode(start + i)
-                    var div = document.createElement("div")
-                    div.className = 'char'
-                    div.innerText = s
-                    frag.appendChild(div)
+                var self = this
+                var _create=function(){
+                    var frag = document.createDocumentFragment()
+                        for (var i = 0; i < len; i++) {
+                            var s = String.fromCharCode(start + i)
+                            var div = document.createElement("div")
+                            div.className = 'char'
+                            div.innerText = s
+                            frag.appendChild(div)
+                        }
+
+                        self.specialchars.appendChild(frag)
+                }
+                if (len > 500) {
+                    var load = document.querySelector(".loading")
+                    load.setAttribute("show", "")
+                    
+                    self.specialchars.innerHTML = ""
+
+                    setTimeout(function() {
+                        _create()
+                        load.removeAttribute("show")
+
+                    }, 10)
+
+                }else{
+                    self.specialchars.innerHTML = ""
+                    _create();
+
                 }
 
-                this.specialchars.innerHTML = ""
-                this.specialchars.appendChild(frag)
+
             },
 
             showTip: function(el, x, y) {
@@ -459,10 +503,10 @@
                     this.tip.style.top = pos.top + pos.height + "px"
                 }
 
-                var section = posinfo(this.closest(this.specialchars, ".section"))
-                if (section.scrollTop > 0) {
-                    this.tip.style.top = pos.top - pos.height * 5 - section.scrollTop + "px"
-                }
+                // var section = posinfo(this.closest(this.specialchars, ".section"))
+                // if (section.scrollTop > 0) {
+                //     this.tip.style.top = pos.top - pos.height * 5 - section.scrollTop + "px"
+                // }
             },
             hideTip: function() {
                 // var tip = document.querySelector(".tip");
@@ -510,7 +554,7 @@
                     self.codeIpt.value = parseInt(this.value, 16)
                 })
 
-                //查询
+                //查询加载字符
                 this.addEvent(this.searchBtn, "click", function() {
                     self.createChars(Number(self.codeIpt.value), Number(self.countIpt.value))
                 })
@@ -539,7 +583,7 @@
                     var el = e.target
                     var thead = self.closest(el, "thead")
 
-                    if (thead) {
+                    if (thead) { //排序
                         var td = self.closest(el, "td")
                         var seq = td.getAttribute("seq")
                         seq = seq === "desc" ? "asc" : "desc"
@@ -551,6 +595,7 @@
 
                         self.reloadUnicodeTable(self.unicode)
                     } else {
+                        //加载字符
                         var tr = self.closest(el, "tr")
                         if (!tr) return;
                         var old = document.querySelector("tr[active]")
@@ -566,7 +611,7 @@
 
                 });
 
-                this.addEvent(document.querySelector(".section"), "scroll", function(e) {
+                this.addEvent(document.querySelector(".section.list"), "scroll", function(e) {
                     self.hideTip()
                     if (e.target.scrollTop > 40) {
                         // console.log(e)
