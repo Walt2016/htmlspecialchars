@@ -83,11 +83,24 @@
         color: #ccc;
     }
     .unicode-table{
-
+    }
+     .unicode-table .fixedTableHead{
+        position: absolute;
+        top:0;
+        left: 0;
+        display: none;
+        background: #dedede;
+        font-size: 12px;
+        line-height: 20px;
+        padding: 2px;
+        font-weight: bolder;
 
     }
+    .unicode-table .fixedTableHead[show]{
+        display: flex
+    }
 
-    .unicode-table table{
+    .unicode-table .fixedTableHead table,.unicode-table table{
         border:1px solid rgb(170,204,238);
         border-collapse:collapse;
         line-height:22px;
@@ -97,12 +110,12 @@
     .unicode-table  table tr{
         cursor: pointer;
     }
+    .unicode-table .fixedTableHead table td,
    .unicode-table  table  td{
         border:1px solid #C0C0C0;
     }
     .unicode-table  table  thead td{
         font-weight:bold;
-        /*display: flex*/
         position: relative;
     }
    /* .unicode-table  table tr:nth-child(even) {
@@ -151,6 +164,8 @@
     [seq='asc'] .icon::before{
         content:"\2193";
     }
+
+   
     </style>
 </head>
 
@@ -284,6 +299,8 @@
 
             this.unicodeTable = document.querySelector(".unicode-table");
 
+
+
             this.flds = [{
                     key: "name",
                     val: "编码分类"
@@ -328,28 +345,48 @@
 
             creatUnicodeTable: function(unicode) {
                 var frag = document.createDocumentFragment()
-                var table = document.createElement("table")
-                var thead = document.createElement("thead");
-                var tr = document.createElement("tr");
+                var self = this
 
-                this.flds.forEach(function(t) {
-                    var td = document.createElement("td")
-                    td.className = t.key
-                    td.innerText = t.val
+                var createTableHead = function() {
+                    var table = document.createElement("table")
+                    var thead = document.createElement("thead");
+                    var tr = document.createElement("tr");
+                    self.flds.forEach(function(t) {
+                        var td = document.createElement("td")
+                        td.className = t.key
+                        td.innerText = t.val
 
-                    var icon = document.createElement("div")
-                    icon.className = "icon"
-                    td.appendChild(icon)
-                    tr.appendChild(td)
-                })
-                thead.appendChild(tr)
-                table.appendChild(thead)
-                frag.appendChild(table)
+                        var icon = document.createElement("div")
+                        icon.className = "icon"
+                        td.appendChild(icon)
+                        tr.appendChild(td)
+                    })
+                    thead.appendChild(tr)
+                    table.appendChild(thead)
+                    return table
+
+                }
 
 
 
+
+                frag.appendChild(createTableHead())
+
+
+
+
+                // this.unicodeTableHead = document.querySelector(".unicode-table table thead");
+
+                this.fixedTableHead = document.createElement("div")
+                this.fixedTableHead.className = "fixedTableHead"
+                // fixedTableHead.appendChild(createTableHead())
+                frag.appendChild(this.fixedTableHead)
+
+                // this.unicodeTable.appendChild(fixedHead)
                 this.unicodeTable.innerHTML = ""
                 this.unicodeTable.appendChild(frag)
+
+
             },
 
             reloadUnicodeTable: function(unicode) {
@@ -427,17 +464,14 @@
                 // }
 
                 var limited = posinfo(this.specialchars)
-                // tip.style.left = Math.min(Math.max(pos.left - pos.width * 2, pos.left), limited.width - pos.width * 5) + "px"
-
-                if (pos.left - pos.width * 2 <= 0) {
+                if (pos.left - pos.width * 2 <= limited.left) {
                     this.tip.style.left = pos.left + "px"
                 } else {
-                    if (pos.left + pos.width * 5 > limited.width) {
+                    if (pos.left + pos.width * 5 > limited.width + limited.left) {
                         this.tip.style.left = pos.left - pos.width * 4 + "px"
                     } else {
                         this.tip.style.left = pos.left - pos.width * 2 + "px"
                     }
-
                 }
 
 
@@ -464,6 +498,10 @@
                 this.creatUnicodeTable(this.unicode);
                 this.reloadUnicodeTable(this.unicode)
                 this.createChars(8672, 1000)
+
+                // console.log(this.unicodeTableHead)
+
+
                 // var specialchars = document.querySelector(".specialchars")||document.body
                 this.addEvent(this.specialchars, "mousemove", function(e) {
                     var e = e || event
@@ -478,11 +516,11 @@
                         self.showTip(char, offx, offy)
                     }
                 });
-                this.addEvent(document.body,"click",function(e){
-                    var el=e.target;
-                    var container=self.closest(el,".specialchars");
-                    if(!container){
-                         self.hideTip()
+                this.addEvent(document.body, "click", function(e) {
+                    var el = e.target;
+                    var container = self.closest(el, ".specialchars");
+                    if (!container) {
+                        self.hideTip()
                     }
 
                 })
@@ -538,6 +576,7 @@
                         self.reloadUnicodeTable(self.unicode)
                     } else {
                         var tr = self.closest(el, "tr")
+                        if (!tr) return;
                         var old = document.querySelector("tr[active]")
                         old && old.removeAttribute("active")
                         tr.setAttribute("active", "");
@@ -549,7 +588,37 @@
 
                     }
 
+                });
+
+                this.addEvent(document.querySelector(".section"), "scroll", function(e) {
+                    self.hideTip()
+                    if (e.target.scrollTop > 40) {
+                        // console.log(e)
+                        var head = document.querySelector(".unicode-table table thead")
+                        var tds = document.querySelectorAll(".unicode-table table thead td")
+                        var frag = document.createDocumentFragment();
+                        self.flds.forEach(function(t, i) {
+                            var div = document.createElement("div");
+                            div.innerHTML = t.val
+                            div.style.width = tds[i].offsetWidth + "px";
+                            frag.appendChild(div)
+                        })
+                        var pos = posinfo(self.unicodeTable)
+                        var headPos = posinfo(head)
+                        // console.log(pos)
+                        self.fixedTableHead.style.top = pos.top + "px";
+                        self.fixedTableHead.style.left = pos.left + "px";
+                        self.fixedTableHead.style.width = pos.width + "px";
+
+                        self.fixedTableHead.innerHTML = ""
+                        // self.fixedTableHead.appendChild(head.cloneNode(true));
+                        self.fixedTableHead.appendChild(frag);
+                        self.fixedTableHead.setAttribute("show", "")
+                    } else {
+                        self.fixedTableHead.removeAttribute("show")
+                    }
                 })
+
 
             }
 
